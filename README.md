@@ -4,11 +4,19 @@ This repository contains the code, data, and images for Florida data center map 
 ## How to view and manipulate the interactive graphic online from your browser
 You can view the current interactive version of the map in your browser by clicking on [this link](https://htmlpreview.github.io/?https://github.com/OpenSourceEcon/FL-DataCtrMap/blob/main/images/fl_datactrmap.html) (it might take a few seconds to load, 82MB). You can also download the html file of the visualization [`fl_datactrmap.html`](/images/fl_datactrmap.html) or create it from the source geographic files from the code in the [`FL-DataCtrMap`](https://github.com/OpenSourceEcon/FL-DataCtrMap) GitHub repository following the steps below.
 
+<p align="center">
+  <img src="screenshots/mainplot.png" width="400">
+</p>
+<p align="center">
+  <em>Figure 1. Screenshot of interactive visualization map of available land for data centers in Florida.</em>
+</p>
+
 When you open the file in your browser, there are some functions you can use in the plotting and legend areas and on the right side of the image.
 - Muting layers in the legend.
 -
 
-![Main plot Florida data center availability map screenshot](screenshots/mainplot.png)
+
+<!-- ![Main plot Florida data center availability map screenshot](screenshots/mainplot.png) -->
 
 ## How to run the code from these analyses on your local computer
 Executing the following steps in order will allow you to replicate the analyses in the article of accessing the geographic data, reading it into the computer, reformatting the data, creating an interactive visualization, and calculating area metrics.
