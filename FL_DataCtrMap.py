@@ -532,14 +532,14 @@ def make_fl_datactrmap(
 
         # Load datasets (examples: replace with your actual file paths)
         bnd_fl = fl_gdf.copy()  # Also have fl_geojson
-        bnd_lakes_res = lakes_res_gdf.copy()  # Also have lakes_res_src
-        bnd_rivers_lakes = rivers_lakes_gdf.copy()  # Also have rivers_lakes_src
-        bnd_state_parks = state_parks_gdf.copy()  # Also have state_parks_src
-        bnd_pub_schl = pub_schl_gdf.copy()  # Also have pub_schl_src
-        bnd_pub_pstsec_schl = pub_pstsec_schl_gdf.copy()  # Also have pub_pstsec_schl_src
-        bnd_priv_schl = priv_schl_gdf.copy()  # Also have priv_schl_src
-        bnd_nat_parks = nat_parks_gdf.copy()  # Also have nat_parks_src
-        bnd_res_bus = res_bus_gdf.copy()  # Also have res_bus_src
+        bnd_lakes_res = lakes_res_gdf.copy()
+        bnd_rivers_lakes = rivers_lakes_gdf.copy()
+        bnd_state_parks = state_parks_gdf.copy()
+        bnd_pub_schl = pub_schl_gdf.copy()
+        bnd_pub_pstsec_schl = pub_pstsec_schl_gdf.copy()
+        bnd_priv_schl = priv_schl_gdf.copy()
+        bnd_nat_parks = nat_parks_gdf.copy()
+        bnd_res_bus = res_bus_gdf.copy()
 
         # Reproject everything to a meters-based CRS (statewide)
         target_crs = "EPSG:3086"
@@ -551,22 +551,28 @@ def make_fl_datactrmap(
         layers_lst = [gdf.to_crs(target_crs) for gdf in layers_lst]
         (
             bnd_fl_crs, bnd_lakes_res_crs, bnd_rivers_lakes_crs,
-            bnd_state_parks_crs, bnd_pub_schl_crs, bnd_pub_pstsec_schl_crs, bnd_priv_schl_crs, bnd_nat_parks_crs, bnd_res_bus_crs
+            bnd_state_parks_crs, bnd_pub_schl_crs, bnd_pub_pstsec_schl_crs,
+            bnd_priv_schl_crs, bnd_nat_parks_crs, bnd_res_bus_crs
         ) = layers_lst
 
         # Buffer each layer by either 1 meter or 5 miles
         buf_lakes_res = bnd_lakes_res_crs.buffer(1)
+        buf_rivers_lakes = bnd_rivers_lakes_crs.buffer(1)
         buf_state_parks = bnd_state_parks_crs.buffer(1)
         buf_nat_parks = bnd_nat_parks_crs.buffer(1)
         buf_pub_schl = bnd_pub_schl_crs.buffer(five_miles_in_meters)
-        buf_pub_pstsec_schl = bnd_pub_pstsec_schl_crs.buffer(five_miles_in_meters)
+        buf_pub_pstsec_schl = bnd_pub_pstsec_schl_crs.buffer(
+            five_miles_in_meters
+        )
         buf_priv_schl = bnd_priv_schl_crs.buffer(five_miles_in_meters)
         buf_res_bus = bnd_res_bus_crs.buffer(five_miles_in_meters)
 
         # Union all exclusion buffers (this is the expensive part)
         exclusion_geom = unary_union(
-            list(buf_lakes_res) + list(buf_state_parks) + list(buf_nat_parks) +
-            list(buf_pub_schl) + list(buf_pub_pstsec_schl) + list(buf_priv_schl) + list(buf_res_bus)
+            list(buf_lakes_res) + list(buf_rivers_lakes) +
+            list(buf_state_parks) + list(buf_nat_parks) +
+            list(buf_pub_schl) + list(buf_pub_pstsec_schl) +
+            list(buf_priv_schl) + list(buf_res_bus)
         )
 
         exclusion_gdf = gpd.GeoDataFrame(
@@ -577,7 +583,9 @@ def make_fl_datactrmap(
         # (If your Florida boundary includes offshore waters, use a "land-only"
         # polygon if possible.)
         available_geom = bnd_fl_crs.geometry.iloc[0].difference(exclusion_geom)
-        available_gdf = gpd.GeoDataFrame(geometry=[available_geom], crs=target_crs)
+        available_gdf = gpd.GeoDataFrame(
+            geometry=[available_geom], crs=target_crs
+        )
 
         # Make CRSs match (important)
         if available_gdf.crs is None:
@@ -603,7 +611,8 @@ def make_fl_datactrmap(
         sec = np.round(elapsed_time_avl % 60, 1)
         print(f"took {min} minutes and {sec} seconds.")
 
-        # Create dictionaries of GeoDataFrames and GeoJSONDataSources for all layers
+        # Create dictionaries of GeoDataFrames and GeoJSONDataSources for all
+        # layers
         gdf_dict = {
             "fl_gdf": fl_gdf,
             "fl_counties_gdf": fl_counties_gdf,
@@ -727,7 +736,7 @@ def make_fl_datactrmap(
     # Make figure
     # -------------------------------------------------------------------------
     fig1_title = (
-        "Figure 1. Florida map of available data center land"
+        "Figure 1. Florida map of available data center land under SB 484"
     )
 
     # fig1_title = ""
@@ -781,7 +790,7 @@ def make_fl_datactrmap(
         fill_alpha=0.4,
         line_alpha=0.8,
         line_width=0.5,
-        muted_alpha=0.04
+        muted_alpha=0.0
     )
 
     # Rivers / Lakes
@@ -792,7 +801,7 @@ def make_fl_datactrmap(
         line_color="blue",
         line_alpha=0.8,
         line_width=0.8,
-        muted_alpha=0.04
+        muted_alpha=0.0
     )
 
     # Florida state park boundaries
@@ -804,7 +813,7 @@ def make_fl_datactrmap(
         fill_alpha=0.4,
         line_alpha=0.8,
         line_width=0.2,
-        muted_alpha=0.04
+        muted_alpha=0.0
     )
 
     # Florida national park boundaries
@@ -816,20 +825,8 @@ def make_fl_datactrmap(
         fill_alpha=0.4,
         line_alpha=0.8,
         line_width=0.2,
-        muted_alpha=0.04
+        muted_alpha=0.0
     )
-
-    # # Florida public, charter, and nonprofit private schools from NLSP 2019 data
-    # # Create scatter plot of nlsp_src data
-    # fig1.circle(
-    #     "x", "y",
-    #     source=src_dict["nlsp_src"],
-    #     color="orange",
-    #     fill_alpha=0.6,
-    #     line_alpha=0.6,
-    #     size=2,
-    #     muted_alpha=0.08,
-    # )
 
     # Florida public schools k-12 from NCES data
     # Create scatter plot of pub_schl_src data
@@ -841,7 +838,7 @@ def make_fl_datactrmap(
         fill_alpha=0.6,
         line_alpha=0.1,
         size=1,
-        muted_alpha=0.04
+        muted_alpha=0.0
     )
 
     # Florida public postsecondary schools from NCES data
@@ -854,7 +851,7 @@ def make_fl_datactrmap(
         fill_alpha=0.6,
         line_alpha=0.1,
         size=1,
-        muted_alpha=0.04
+        muted_alpha=0.0
     )
 
     # Florida private schools from NCES data
@@ -867,7 +864,7 @@ def make_fl_datactrmap(
         fill_alpha=0.6,
         line_alpha=0.1,
         size=1,
-        muted_alpha=0.04
+        muted_alpha=0.0
     )
 
     # Florida residence and buildings sample of 200,000 centroids or
@@ -880,7 +877,7 @@ def make_fl_datactrmap(
         fill_alpha=0.6,
         line_alpha=0.1,
         size=1,
-        muted_alpha=0.04,
+        muted_alpha=0.0
     )
 
     # Available area overlay
@@ -892,7 +889,7 @@ def make_fl_datactrmap(
         fill_alpha=1.0,
         line_alpha=0.6,
         line_width=0.2,
-        muted_alpha=0.04
+        muted_alpha=0.0
     )
 
     fig1_legend = Legend(items=[
