@@ -5,6 +5,7 @@
 \usepackage{geometry}
 \geometry{letterpaper,tmargin=1in,bmargin=1in,lmargin=1.25in,rmargin=1.25in}
 \usepackage[format=hang,font=normalsize,labelfont=bf]{caption}
+\usepackage{subcaption}
 \usepackage{amsmath}
 \usepackage{multirow}
 \usepackage{array}
@@ -71,9 +72,25 @@
 \section{Introduction}\label{SecIntro}
 
 
-\begin{figure}[htb]\centering \captionsetup{width=4.0in}
-  \caption{\label{FigMain}\textbf{Screenshot of available data center land under SB 484}}
-  \fbox{\resizebox{4.0in}{3.0in}{\includegraphics{./images/FL_MapClean.png}}}
+\begin{figure}[htbp]\centering \captionsetup{width=3.0in}
+  \caption{Screenshots of Florida interactive map of available data center land under SB 484}
+  \label{Fig1_MainFig}
+  % First panel
+  \begin{subfigure}[b]{0.49\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{./images/FL_MapMain.png}
+      \caption{All layers}
+      \label{Fig1_MainFigA}
+  \end{subfigure}
+  \vfill % Adds vertical space between the subfigures
+  % Second panel
+  \begin{subfigure}[b]{0.49\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{./images/FL_MapClean.png}
+      \caption{Highlighting available data center land}
+      \label{Fig1_MainFigB}
+  \end{subfigure}
+  \caption*{\footnotesize{Source: Richard W. Evans (@RickEcon) updated Mar. 17, 2026. Note that the business and residence scatter points are a random sample of 200,000 centroid points from the over 7 million residences and businesses in the data. I used the full sample of business and residence outlines in the calculation for available data center land, but I excluded the majority of those points from this figure in order to successfully plot them.}}
 \end{figure}
 
 
